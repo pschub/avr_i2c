@@ -26,12 +26,10 @@
 #define STATUS_RSTARTED (0x10)
 #define STATUS_ARBITRATION_LOST (0x38)
 
-#define START_BIT (1<<5)
-#define STOP_BIT (1<<4)
+#define START_BIT (0x20)
+#define STOP_BIT (0x10)
 
 #define ADX_MASK (0x1)
-//#define ACK (0x40)
-//#define NACK_MASK (0xBF)
 
 #define WRITE (0x0)
 #define READ (0x1)

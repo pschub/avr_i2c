@@ -3,6 +3,12 @@
    i2c Helper
    Patrick Schubert
    Created March 30, 2013
+
+   Currently implementing just initialization and single byte read/writes.
+   Nice things to have in the future:
+   - Interrupt-driven
+   - Circular buffers
+   - Ice cream maker
 */
 
 #ifndef I2CHELPER_H
