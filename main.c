@@ -5,49 +5,82 @@ Started March 30, 2013
 
 */
 
-#define F_CPU 8000000
+#define F_CPU 1000000
 
 
 #include <avr/io.h>
+#include <util/delay.h>
 #include <avr/interrupt.h>
 #include "i2c.h"
 
 #define EEPROM_ADX 0x1
 #define SENS_ADX 0xA
 #define OFFSET_ADX 0xC
-//RH = (offset-SoH)*sens/2^12
-// where SoH is the measured frequency
 
 //function prototypes
 void setupUC(void);
+int getAnInt(void);
+void printNum(int num);
 
 
 int main(void)
 {
-   char i2cReturn;
-   char deviceAdx = 0xA2;
-   volatile int i,j;
+    char i2cReturn;
+    char deviceAdx = 0xA2;
+    unsigned int value;
+    int i;
     setupUC();
     setupI2C();
 
+    UBRR0 = 12;
+    UCSR0B = 0x8; //enable TX
+    UCSR0C = 0x26; //4800 8/1/even parity
+
+
     for(;;){
         PORTD ^= 0x1;
-        if (!writeByte(deviceAdx,0xA)){
-          for (i=0; i<25;i++){
-            for (j=0; j<10; j++){
-
-            }
-           }
-           readByte(deviceAdx, &i2cReturn);
+        while ( (~UCSR0A) & (1<<UDRE0));
+        UDR0 = '?';
+        _delay_ms(1000);
+        writeByte(deviceAdx, 0xA);
+        _delay_ms(5);
+        for (i=0; i<2; i++){
+            while ( (~UCSR0A) & (1<<UDRE0));
+            UDR0 = ':';
+            _delay_ms(500);
+            readByte(deviceAdx, &i2cReturn);
+            value = i2cReturn;
+            value = value<<8;
+            _delay_ms(5);
+            readByte(deviceAdx, &i2cReturn);
+            _delay_ms(500);
+            value |= i2cReturn;
+            printNum(value);
+            _delay_ms(1000);
         }
-        for (i=0; i<25;i++){
-            for (j=0; j<10; j++){
 
-            }
-        }
     }
 
     return 0;
+}
+
+
+void printNum(int num){
+    char digit = num/10000;
+    while ( (~UCSR0A) & (1<<UDRE0));
+    UDR0 = digit + 0x30;
+    digit = (num%10000)/1000;
+    while ( (~UCSR0A) & (1<<UDRE0));
+    UDR0 = digit + 0x30;
+    digit = (num%1000)/100;
+    while ( (~UCSR0A) & (1<<UDRE0));
+    UDR0 = digit + 0x30;
+    digit = (num%100)/10;
+    while ( (~UCSR0A) & (1<<UDRE0));
+    UDR0 = digit + 0x30;
+    digit = (num%10);
+    while ( (~UCSR0A) & (1<<UDRE0));
+    UDR0 = digit + 0x30;
 }
 
 
