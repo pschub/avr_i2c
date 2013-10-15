@@ -24,12 +24,12 @@ void setupUC(void);
 
 int main(void)
 {
-   char i2cReturn; 
+   char i2cReturn;
    char deviceAdx = 0xA2;
    volatile int i,j;
     setupUC();
     setupI2C();
-        
+
     for(;;){
         PORTD ^= 0x1;
         if (!writeByte(deviceAdx,0xA)){
@@ -46,25 +46,25 @@ int main(void)
             }
         }
     }
-    
+
     return 0;
 }
 
 
-//initializes uC. 
+//initializes uC.
 void setupUC(void){
     //Setup the rtc
-  cli();        
+  cli();
   TCCR2B |= 1<<CS10; //| 1<<CS11;    //Divide by 64
   OCR2A = 250;        //Count 15624 cycles for 1 second interrupt
   TCCR2B |= 1<<WGM12;        //Put Timer/Counter1 in CTC mode
   //TIMSK2 |= 1<<OCIE2A;        //enable timer compare interrupt
-  sei();            
-  
+  sei();
+
   //debug pin D0 (pin 2)
-  DDRD |= (1<<1)|(1<<0);    //set as output    
+  DDRD |= (1<<1)|(1<<0);    //set as output
   PORTD |= (1<<1)|(1<<0);        //set hi
-  
+
   //input pins
   DDRC = 0; //set portC as input
   PORTC = 0x00;
